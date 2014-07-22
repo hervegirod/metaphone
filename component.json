@@ -1,0 +1,12 @@
+{
+  "name": "metaphone-gh-pages",
+  "private": true,
+  "repository": "wooorm/metaphone",
+  "dependencies": {
+    "wooorm/metaphone": "^0.1.0"
+  },
+  "scripts": [
+    "index.js"
+  ],
+  "license": "MIT"
+}
