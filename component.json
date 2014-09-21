@@ -3,7 +3,7 @@
   "private": true,
   "repository": "wooorm/metaphone",
   "dependencies": {
-    "wooorm/metaphone": "^0.1.0"
+    "wooorm/metaphone": "^0.1.1"
   },
   "scripts": [
     "index.js"
