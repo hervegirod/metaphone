@@ -52,7 +52,7 @@ require.define = function (name, exports) {
     exports: exports
   };
 };
-require.register("wooorm~metaphone@0.1.1", function (exports, module) {
+require.register("wooorm~metaphone@0.1.2", function (exports, module) {
 'use strict';
 
 var EXPRESSION_DUPLICATE_ADJACENT_LETTERS,
@@ -334,7 +334,7 @@ module.exports = metaphone;
 });
 
 require.register("metaphone-gh-pages", function (exports, module) {
-var metaphone = require("wooorm~metaphone@0.1.1");
+var metaphone = require('wooorm~metaphone@0.1.2');
 var inputElement = document.getElementsByTagName('input')[0];
 var outputElement = document.getElementsByTagName('output')[0];
 
@@ -348,4 +348,4 @@ getPhonetics();
 
 });
 
-require("metaphone-gh-pages")
+require("metaphone-gh-pages");
