@@ -1,11 +1,34 @@
-var metaphone = require('metaphone');
-var inputElement = document.getElementsByTagName('input')[0];
-var outputElement = document.getElementsByTagName('output')[0];
+'use strict';
 
-function getPhonetics() {
-    outputElement.textContent = metaphone(inputElement.value);
-}
+/**
+ * Dependencies.
+ */
 
-inputElement.addEventListener('input', getPhonetics);
+var metaphone = require('wooorm/metaphone@0.1.4');
 
-getPhonetics();
+/**
+ * DOM elements.
+ */
+
+var $input = document.getElementsByTagName('input')[0];
+var $output = document.getElementsByTagName('output')[0];
+
+/**
+ * Event handlers.
+ */
+
+function oninputchange() {
+    $output.textContent = metaphone($input.value);
+  }
+
+/**
+ * Listen.
+ */
+
+$input.addEventListener('input', oninputchange);
+
+/**
+ * Initial answer.
+ */
+
+oninputchange();

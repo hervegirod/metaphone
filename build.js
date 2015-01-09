@@ -1,58 +1,124 @@
-/**
- * Require the module at `name`.
- *
- * @param {String} name
- * @return {Object} exports
- * @api public
- */
+(function outer(modules, cache, entries){
 
-function require(name) {
-  var module = require.modules[name];
-  if (!module) throw new Error('failed to require "' + name + '"');
+  /**
+   * Global
+   */
 
-  if (!('exports' in module) && typeof module.definition === 'function') {
-    module.client = module.component = true;
-    module.definition.call(this, module.exports = {}, module);
-    delete module.definition;
+  var global = (function(){ return this; })();
+
+  /**
+   * Require `name`.
+   *
+   * @param {String} name
+   * @param {Boolean} jumped
+   * @api public
+   */
+
+  function require(name, jumped){
+    if (cache[name]) return cache[name].exports;
+    if (modules[name]) return call(name, require);
+    throw new Error('cannot find module "' + name + '"');
   }
 
-  return module.exports;
-}
+  /**
+   * Call module `id` and cache it.
+   *
+   * @param {Number} id
+   * @param {Function} require
+   * @return {Function}
+   * @api private
+   */
+
+  function call(id, require){
+    var m = cache[id] = { exports: {} };
+    var mod = modules[id];
+    var name = mod[2];
+    var fn = mod[0];
+
+    fn.call(m.exports, function(req){
+      var dep = modules[id][1][req];
+      return require(dep ? dep : req);
+    }, m, m.exports, outer, modules, cache, entries);
+
+    // expose as `name`.
+    if (name) cache[name] = cache[id];
+
+    return cache[id].exports;
+  }
+
+  /**
+   * Require all entries exposing them on global if needed.
+   */
+
+  for (var id in entries) {
+    if (entries[id]) {
+      global[entries[id]] = require(id);
+    } else {
+      require(id);
+    }
+  }
+
+  /**
+   * Duo flag.
+   */
+
+  require.duo = true;
+
+  /**
+   * Expose cache.
+   */
+
+  require.cache = cache;
+
+  /**
+   * Expose modules
+   */
+
+  require.modules = modules;
+
+  /**
+   * Return newest require.
+   */
+
+   return require;
+})({
+1: [function(require, module, exports) {
+'use strict';
 
 /**
- * Registered modules.
+ * Dependencies.
  */
 
-require.modules = {};
+var metaphone = require('wooorm/metaphone@0.1.4');
 
 /**
- * Register module at `name` with callback `definition`.
- *
- * @param {String} name
- * @param {Function} definition
- * @api private
+ * DOM elements.
  */
 
-require.register = function (name, definition) {
-  require.modules[name] = {
-    definition: definition
-  };
-};
+var $input = document.getElementsByTagName('input')[0];
+var $output = document.getElementsByTagName('output')[0];
 
 /**
- * Define a module's exports immediately with `exports`.
- *
- * @param {String} name
- * @param {Generic} exports
- * @api private
+ * Event handlers.
  */
 
-require.define = function (name, exports) {
-  require.modules[name] = {
-    exports: exports
-  };
-};
-require.register("wooorm~metaphone@0.1.2", function (exports, module) {
+function oninputchange() {
+    $output.textContent = metaphone($input.value);
+  }
+
+/**
+ * Listen.
+ */
+
+$input.addEventListener('input', oninputchange);
+
+/**
+ * Initial answer.
+ */
+
+oninputchange();
+}, {"wooorm/metaphone@0.1.4":2}],
+2: [function(require, module, exports) {
 'use strict';
 
 var EXPRESSION_DUPLICATE_ADJACENT_LETTERS,
@@ -84,66 +150,66 @@ var EXPRESSION_DUPLICATE_ADJACENT_LETTERS,
     EXPRESSION_Z,
     EXPRESSION_VOWELS;
 
-/**
+/*
  * Matches duplicate characters (excluding `c`), of which
  * one should be dropped.
  */
 
 EXPRESSION_DUPLICATE_ADJACENT_LETTERS = /([^c])\1/g;
 
-/**
+/*
  * Matches two characters at the start of a string, of
  * which the first is silent.
  */
 
 EXPRESSION_INITIALS = /^(kn|gn|pn|ae|wr)/g;
 
-/**
+/*
  * Matches `mb` at the end of string, of which the `b`
  * should be dropped.
  */
 
 EXPRESSION_MB_FINAL = /(m)b$/g;
 
-/**
+/*
  * Matches `c`.
  */
 
 EXPRESSION_C = /c/g;
 
-/**
+/*
  * Matches values which should be transformed to `x`.
  */
 
 EXPRESSION_TO_X = /^ch|[^s]ch|cia/g;
 
-/**
+/*
  * Matches values which should be transformed to `s`.
  */
 
 EXPRESSION_TO_S = /c([iey])/g;
 
-/**
+/*
  * Matches values containing `d` which should be
  * transformed to `j`.
  */
 
 EXPRESSION_D_TO_J = /d(g[eiy])/g;
 
-/**
+/*
  * Matches `d`.
  */
 
 EXPRESSION_D = /d/g;
 
-/**
+/*
  * Matches values containing `gh` of which the `g` should
  * be dropped.
  */
 
 EXPRESSION_G_NOT_FINAL = /g(h[^aeiou])/g;
 
-/**
+/*
  * Matches final values of which the `g` should be dropped.
  *
  * Bug: All D's were transformed to T's, weird.
@@ -151,7 +217,7 @@ EXPRESSION_G_NOT_FINAL = /g(h[^aeiou])/g;
 
 EXPRESSION_GN_OR_GNED_FINAL = /g(n(ed)?)$/g;
 
-/**
+/*
  * Matches values of which the `g` should be dropped.
  *
  * Bug: Now, the spec says not to transform G to J when
@@ -161,105 +227,105 @@ EXPRESSION_GN_OR_GNED_FINAL = /g(n(ed)?)$/g;
 
 EXPRESSION_G_TO_J = /g([iey])/g;
 
-/**
+/*
  * Matches `g`.
  */
 
 EXPRESSION_G = /g/g;
 
-/**
+/*
  * Matches values of which the `h` should be dropped.
  */
 
 EXPRESSION_H = /([aeiou])h([^aeiou]|$)/g;
 
-/**
+/*
  * Matches `ck`.
  */
 
 EXPRESSION_CK = /ck/g;
 
-/**
+/*
  * Matches `ph`.
  */
 
 EXPRESSION_PH = /ph/g;
 
-/**
+/*
  * Matches `q`.
  */
 
 EXPRESSION_Q = /q/g;
 
-/**
+/*
  * Matches values containing `s` which should be replaced
  * with `x`.
  */
 
 EXPRESSION_S = /s(h|ia|io)/g;
 
-/**
+/*
  * Matches values containing `t` which should be replaced
  * with `x`.
  */
 
 EXPRESSION_T = /t(ia|io)/g;
 
-/**
+/*
  * Matches `th`.
  */
 
 EXPRESSION_TH = /th/g;
 
-/**
+/*
  * Matches `tch`.
  */
 
 EXPRESSION_TCH = /tch/g;
 
-/**
+/*
  * Matches `v`.
  */
 
 EXPRESSION_V = /v/g;
 
-/**
+/*
  * Matches initial `wh`.
  */
 
 EXPRESSION_WH = /^wh/g;
 
-/**
+/*
  * Matches `w`, not followed by a vowel.
  */
 
 EXPRESSION_W = /w([^aeiou]|$)/g;
 
-/**
+/*
  * Matches initial `x`.
  */
 
 EXPRESSION_INITIAL_X = /^x/g;
 
-/**
+/*
  * Matches `x`.
  */
 
 EXPRESSION_X = /x/g;
 
-/**
+/*
  * Matches `y`, not followed by a vowel.
  */
 
 EXPRESSION_Y = /y([^aeiou]|$)/g;
 
-/**
+/*
  * Matches `z`.
  */
 
 EXPRESSION_Z = /z/;
 
-/**
+/*
  * Matches vowels (no `y`).
  */
 
@@ -267,16 +333,20 @@ EXPRESSION_VOWELS = /[aeiou]/g;
 
 /**
  * Return the character at `1`.
+ *
+ * @param {string} $0
+ * @return {string}
  */
-
 function initials($0) {
     return $0.charAt(1);
 }
 
 /**
  * Return the value, `c`s replaced with `x`s.
+ *
+ * @param {string} $0
+ * @return {string}
  */
-
 function cToX($0) {
     return $0.replace(EXPRESSION_C, 'x');
 }
@@ -288,7 +358,6 @@ function cToX($0) {
  * @param {string} value - value to detect phonetics for.
  * @return {string} phonetics.
  */
-
 function metaphone(value) {
     value = String(value)
         .toLowerCase()
@@ -325,27 +394,10 @@ function metaphone(value) {
     return value.toUpperCase();
 }
 
-/**
+/*
  * Expose `metaphone`.
  */
 
 module.exports = metaphone;
 
-});
-
-require.register("metaphone-gh-pages", function (exports, module) {
-var metaphone = require('wooorm~metaphone@0.1.2');
-var inputElement = document.getElementsByTagName('input')[0];
-var outputElement = document.getElementsByTagName('output')[0];
-
-function getPhonetics() {
-    outputElement.textContent = metaphone(inputElement.value);
-}
-
-inputElement.addEventListener('input', getPhonetics);
-
-getPhonetics();
-
-});
-
-require("metaphone-gh-pages");
+}, {}]}, {}, {"1":""})
