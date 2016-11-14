@@ -1,5 +1,7 @@
-build/
-components/
+.DS_Store
+*.log
+.nyc_output/
 coverage/
 node_modules/
-.DS_Store
+metaphone.js
+metaphone.min.js
