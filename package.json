@@ -2,10 +2,10 @@
   "name": "metaphone-www",
   "private": true,
   "dependencies": {
-    "metaphone": "^1.0.0"
+    "metaphone": "^1.0.2"
   },
   "devDependencies": {
-    "browserify": "^13.1.1"
+    "browserify": "^14.0.0"
   },
   "scripts": {
     "build": "browserify index.js > build.js"
